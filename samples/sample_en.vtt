@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.000
+This is a rather long English sentence that exceeds the per-line character limit we configured for the checker
+
+00:00:07.600 --> 00:00:08.000
+Too short dwell time here.
+
+00:00:08.600 --> 00:00:09.400
+This cue crams far too many words into barely eight hundred ms of time
+
+00:00:09.900 --> 00:00:12.900
+A normal cue with enough reading time.
+
+00:00:13.100 --> 00:00:15.300
+Boundary reallocation moves some words across
+
+00:00:15.450 --> 00:00:18.600
+these two cues with ease when the time gap is small.
+
+00:00:19.100 --> 00:00:22.100
+Final cue is fine and reading stays comfortable.

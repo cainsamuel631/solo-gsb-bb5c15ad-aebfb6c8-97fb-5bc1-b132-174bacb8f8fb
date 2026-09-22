@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>字幕断句校验台</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>字幕断句校验台</h1>
+    <p class="subtitle">上传 WebVTT / SRT，动态规划跨 cue 断句 · 标出无法满足约束的最小区段</p>
+  </header>
+
+  <main>
+    <!-- 配置区 -->
+    <section class="card" id="config-card">
+      <h2>1. 选择文件与阈值</h2>
+      <form id="analyze-form">
+        <div class="form-row">
+          <label class="file-picker">
+            <input type="file" id="file" name="file" accept=".vtt,.srt,text/vtt,application/x-subrip" required />
+            <span id="file-label">点击选择 .vtt / .srt 文件…</span>
+          </label>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="max_chars">每行最大字数</label>
+            <input type="number" id="max_chars" name="max_chars" value="21" min="4" max="200" />
+            <small>单行字符数上限（折行时不拆单词）</small>
+          </div>
+          <div class="field">
+            <label for="min_dwell_ms">最小停留 (ms)</label>
+            <input type="number" id="min_dwell_ms" name="min_dwell_ms" value="1000" min="0" max="60000" step="100" />
+            <small>每条 cue 的最短展示时长</small>
+          </div>
+          <div class="field">
+            <label for="cps_max">最大阅读速度 (字/秒)</label>
+            <input type="number" id="cps_max" name="cps_max" value="17" min="1" max="100" step="0.5" />
+            <small>超过则需要放慢或拆句</small>
+          </div>
+          <div class="field">
+            <label for="merge_gap_ms">跨 cue 合并间隙 (ms)</label>
+            <input type="number" id="merge_gap_ms" name="merge_gap_ms" value="250" min="0" max="5000" step="50" />
+            <small>相邻 cue 间隙不超过该值时允许重分配边界</small>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">开始校验</button>
+          <a id="export-btn" class="btn secondary hidden" download>导出修订 WebVTT</a>
+          <span id="form-status" class="status"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- 结果总览 -->
+    <section class="card hidden" id="result-card">
+      <h2>2. 校验结果 <span id="lang-badge" class="badge"></span></h2>
+      <div class="stat-grid" id="stats"></div>
+    </section>
+
+    <!-- 问题筛选 -->
+    <section class="card hidden" id="issues-card">
+      <h2>3. 问题清单</h2>
+      <div class="filter-bar">
+        <label>
+          语言
+          <select id="filter-language"><option value="all">全部</option></select>
+        </label>
+        <label>
+          类型
+          <select id="filter-type">
+            <option value="all">全部</option>
+            <option value="overlong">超字数</option>
+            <option value="dwell">停留过短</option>
+            <option value="speed">阅读速度过快</option>
+            <option value="unsolvable">不可满足</option>
+          </select>
+        </label>
+        <span class="hint">筛选来自全部历史任务</span>
+      </div>
+      <div id="issue-list" class="issue-list"></div>
+    </section>
+
+    <!-- 修订后 cue 列表 -->
+    <section class="card hidden" id="cues-card">
+      <h2>4. 修订后断句（动态规划结果）</h2>
+      <div class="legend">
+        <span class="dot error"></span> 硬约束违规 / 不可满足最小区段
+        <span class="dot warning"></span> 接近阈值
+        <span class="dot ok"></span> 达标
+      </div>
+      <div id="cue-list" class="cue-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>字幕断句校验台 · FastAPI + SQLite · <code>POST /api/analyze</code></span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
